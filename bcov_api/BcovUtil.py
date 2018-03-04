@@ -20,14 +20,21 @@ class BcovUtil():
             oauthUrl = "https://oauth.brightcove.com/v3/access_token"
             payload = {'grant_type': 'client_credentials'}
             authString = self.clientId + ':' + self.clientSecret
-            # Little bit of funkiness here. I need to first turn this string into a byte
-            # array so I can b64 encode it. Then after I encode it I need to turn it
-            # back in to a string so I can add it to the header.
-            b_authString = bytes(authString, 'utf-8')
-            b_array = base64.b64encode(b_authString)
+
+            # # This is the way we need to do it for Python3
+            # # Little bit of funkiness here. I need to first turn this string into a byte
+            # # array so I can b64 encode it. Then after I encode it I need to turn it
+            # # back in to a string so I can add it to the header.
+            # b_authString = bytes(authString, 'utf-8')
+            # b_array = base64.b64encode(b_authString)
+            #
+            # headers = {'Content-Type': 'application/x-www-form-urlencoded',
+            #            'Authorization': 'Basic ' + b_array.decode("utf-8")}
+            #
 
             headers = {'Content-Type': 'application/x-www-form-urlencoded',
-                       'Authorization': 'Basic ' + b_array.decode("utf-8")}
+                       'Authorization': 'Basic ' + base64.b64encode(authString)}
+
             # alive_logger.info(headers)
             r = requests.post(oauthUrl, data=payload, headers=headers)
             data = r.json()

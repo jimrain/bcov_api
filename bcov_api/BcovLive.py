@@ -31,7 +31,6 @@ class BcovLive():
         except Exception as e:
             alive_logger.error(e.message)
 
-
     def get_job(self, job_id):
         url = base_url + 'jobs/' + job_id
 
