@@ -3,9 +3,21 @@ import requests
 import json
 import logging
 
-alive_logger = logging.getLogger('alive')
+# alive_logger = logging.getLogger('alive')
 
 base_url = "https://api.bcovlive.io/v1/"
+
+class AliveLogger():
+    def __init__(self, name):
+        self.name = name
+
+    def info(self, s):
+        print("Info: " + str(s))
+
+    def error(self, s):
+        print("Error: " + str(s))
+
+alive_logger = AliveLogger('alive')
 
 
 class BcovLive():
@@ -150,6 +162,47 @@ class BcovLive():
                 alive_logger.error (r.text)
         except Exception as e:
             alive_logger.error (e.message)
+
+    def get_account_ad_configurations(self):
+        url = base_url + 'ssai/applications/' + self.account_id
+
+        try:
+            headers = {'Content-Type': 'application/json', 'X-API-KEY': self.api_token}
+
+            r = requests.get(url, headers=headers)
+            status = r.status_code
+            if r.status_code == 200:
+                j = r.json()
+                # print(json.dumps(j, indent=2))
+                return (j)
+            else:
+                # print(r.status_code)
+                # print(r.text)
+                alive_logger.error (r.status_code)
+                alive_logger.error (r.text)
+        except Exception as e:
+            alive_logger.error (e.message)
+
+        return None
+
+
+    def delete_ad_configuration(self, app_id):
+        url = base_url + 'ssai/application/' + app_id
+
+        try:
+            headers = {'Content-Type': 'application/json', 'X-API-KEY': self.api_token}
+
+            r = requests.delete(url, headers=headers)
+            status = r.status_code
+            if r.status_code == 200:
+                j = r.json()
+                return (j)
+            else:
+                alive_logger.error (r.status_code)
+                alive_logger.error (r.text)
+        except Exception as e:
+            alive_logger.error (e.message)
+
 
     def big_red_button(self, job_id, duration):
         # "https://api.bcovlive.io/v1/jobs/{jobs_id}/cuepoint

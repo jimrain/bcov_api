@@ -9,8 +9,8 @@ from bcov_simlive_api import BcovSimLive
 # vc_clientID = "ea2f0cc2-c6e1-4dce-846c-5ff5ee96910b"
 # vc_clientSecret = "2UW_0_uYhuSO0Ka2ew6J6RbkGBC53sEKf49wOuBMv2xQktnJ1zSsbUykv1r8Jz66QGfVe9vGtnme8D8KqZM3IQ"
 # Change this to match install
-wowza_root = "/Library/WowzaStreamingEngine/"
-# wowza_root = "/Users/jim/Downloads/"
+# wowza_root = "/Library/WowzaStreamingEngine/"
+wowza_root = "/Users/jim/Downloads/"
 
 class WowzaSync():
     # bcov_cms = BcovCMS.BcovCMS(vc_accountID, vc_clientID, vc_clientSecret)
@@ -67,15 +67,18 @@ class WowzaSync():
 
         bcov_cms = BcovCMS.BcovCMS(bc_account['accountId'], bc_account['clientId'], bc_account['clientSecret'])
         vids = self.get_broadcaststream_vids(bcov_cms)
+        print (vids)
 
         for vid in vids:
             # Strip off existing extension, suck out white space and make it an mp4.
+            # JR - This doesn't work if there is a period in the title - FIX!
             absolute_video_path = target_dir + vid['name'].split('.')[0].replace(" ", "") + '.mp4'
+            print (absolute_video_path)
             status = self.write_video_to_storage(vid, absolute_video_path, bcov_cms)
-
+            print (status)
             if status is 'SUCCESS':
                 data = {
-                    "title": vid['name'],
+                    "name": vid['name'],
                     "bcAccount": bc_account['id'], # This needs to be the pk for the account ID record.
                     "video_id": vid['id'],
                     "duration": vid['duration'],

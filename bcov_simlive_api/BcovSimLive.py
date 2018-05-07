@@ -17,15 +17,6 @@ class BcovSimLive():
     def create_video(self, video_data):
         headers = {'Content-Type': 'application/json'}
 
-        # data = {
-        #     "title": "Test Title",
-        #     "bcAccount": "1", # This needs to be the pk for the account ID record.
-        #     "video_id": "12345",
-        #     "duration": "23",
-        #     "description": "This is my first video",
-        #     "path": "path to the video"
-        #     }
-
         videoUrl = base_simlive_url + 'videos'
         r = requests.post(videoUrl, data=json.dumps(video_data), headers=headers)
 
@@ -42,6 +33,17 @@ class BcovSimLive():
 
     def apiTest(self):
         print (self.get_bc_accounts())
+
+        data = {
+            "name": "Test Title",
+            "bcAccount": "1", # This needs to be the pk for the account ID record.
+            "video_id": "12345",
+            "duration": "23",
+            "description": "This is my first video",
+            "path": "path to the video"
+        }
+
+        print (self.create_video(data))
 
 # bcSimLive = BcovSimLive()
 # bcSimLive.apiTest()
