@@ -1,7 +1,8 @@
 from bcov_api import BcovLive
-from urlparse import urlparse
+from urllib.parse import urlparse
 import pickle
 import json
+import os
 
 # Live auth tokens.
 api_token = 'rvCkWHIDhs4FwUyk2oS0Q7iB9GsXNz5A20UJu1al'
@@ -36,48 +37,23 @@ class RokuLive():
                         "xpath": "/",
                         "xslt": "<xsl:stylesheet version=\"1.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" xmlns:Det=\"http://Det.com\"><xsl:output omit-xml-declaration=\"yes\"/><xsl:template match=\"node()|@*\"><xsl:copy><xsl:apply-templates select=\"node()|@*\"/></xsl:copy></xsl:template></xsl:stylesheet>"
                     }],
-                "ad_configuration_url_format": "https://ads.brightcove.com/ads?tech=vast&dur=60",
+                "ad_configuration_url_format": "https://ads.brightcove.com/ads?tech=vast&dur=30",
             },
             "application_description": "Roku Live ad application",
             "account_id": account_id,
             "application_segment_buffer": 4
         }
 
-        print (self.bcov_live.create_ad_configuration(data))
-
-
-    def update_ad_configuration(self, app_id):
-        # ad_tag = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator="
-        ad_tag = "https://a71csqxusb.execute-api.us-west-2.amazonaws.com/stable/ads"
-
-        data = {
-            "application_ad_configuration": {
-                "ad_configuration_description": "Jim's Test ad config",
-                "ad_configuration_expected_response_type": "Vast",
-                "ad_configuration_strategy": "SingleAdResponse",
-                "ad_configuration_transforms": [
-                    {
-                        "xpath": "/",
-                        "xslt": "<xsl:stylesheet version=\"1.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" xmlns:Det=\"http://Det.com\"><xsl:output omit-xml-declaration=\"yes\"/><xsl:template match=\"node()|@*\"><xsl:copy><xsl:apply-templates select=\"node()|@*\"/></xsl:copy></xsl:template></xsl:stylesheet>"
-                    }],
-                "ad_configuration_url_format": ad_tag,
-                "ad_configuration_variables": {
-                    "once": "true",
-                    "tech": "vast"
-                }
-            },
-            "application_description": "Jim's Test ad application",
-            "account_id": account_id,
-            "application_segment_buffer": 6
-        }
-
-        self.bcov_live.update_ad_configuration(app_id, data)
+        ad_config = self.bcov_live.create_ad_configuration(data)
+        print (ad_config)
+        return ad_config
 
 
     def create_job(self):
         data = {
             "ad_insertion": True,
             "live_stream": True,
+            "slate": slate_id,
             "region": "us-west-2",
             "reconnect_time": 20,
             "live_sliding_window_duration": 30,
@@ -122,9 +98,14 @@ class RokuLive():
 
     def create_and_store_job(self):
         job_details = self.create_job()
-        print json.dumps(job_details, indent=2)
+        print(json.dumps(job_details, indent=2))
         pickle.dump(job_details, open(roku_alive_job_file, "wb"))
 
+
+    def create_and_store_ad_config(self):
+        ad_config = self.create_ad_configuration()
+        print(json.dumps(ad_config, indent=2))
+        pickle.dump(ad_config, open(ad_config_archive_file, "wb"))
 
     def cleanup_ad_configs(self):
         configs = self.bcov_live.get_account_ad_configurations()
@@ -132,6 +113,13 @@ class RokuLive():
         # pickle.dump(configs, open("Alive_ad_configs.pkl", "wb"))
         for config in configs:
             print(self.bcov_live.delete_ad_configuration(config['application_id']))
+
+    def kill_live_job(self):
+        job_dict = pickle.load(open(roku_alive_job_file, "rb"))
+        job_id = job_dict['id']
+        self.bcov_live.kill_job(job_id)
+        # Remove the pickle file so we don't save stale data
+        os.remove(roku_alive_job_file)
 
 
     def press_the_button(self, duration):
@@ -149,7 +137,6 @@ class RokuLive():
         job_details = pickle.load(open(roku_alive_job_file, "rb"))
         print(json.dumps(job_details, indent=2))
 
-
     def dump_rtmp_info(self):
         job_details = pickle.load(open(roku_alive_job_file, "rb"))
         print ("Application Name: " + job_details['id'])
@@ -157,17 +144,35 @@ class RokuLive():
         print ("Host: " + stream_info.netloc.split(':')[0])
         print("Stream Name: " + job_details['stream_name'])
 
+    def dump_ad_config(self):
+        ad_config = pickle.load(open(ad_config_archive_file, "rb"))
+        print(json.dumps(ad_config, indent=2))
+
+    def dump_playback_url(self):
+        job_details = pickle.load(open(roku_alive_job_file, "rb"))
+        ad_config = pickle.load(open(ad_config_archive_file, "rb"))
+
+        print(json.dumps(job_details['ssai_playback_urls'], indent=2))
+        print(json.dumps(ad_config, indent=2))
 
 roku = RokuLive()
-# roku.create_ad_configuration()
+
+# roku.create_and_store_ad_config()
 # roku.cleanup_ad_configs()
 # print (roku.bcov_live.get_account_ad_configurations())
 
 # roku.create_and_store_job()
 # print (roku.bcov_live.ingest_slate(slate_url))
 
-# roku.press_the_button(30)
+roku.press_the_button(60)
 
 # roku.dump_the_pickle()
 # roku.dump_rtmp_info()
-roku.dump_ad_config_archive()
+# roku.dump_ad_config_archive()
+# roku.dump_ad_config()
+# roku.dump_playback_url()
+
+# roku.kill_live_job()
+
+# print (json.dumps(roku.bcov_live.get_account_ad_configurations(), indent=2))
+
