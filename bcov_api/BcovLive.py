@@ -75,6 +75,38 @@ class BcovLive():
         except Exception as e:
             alive_logger.error (e.message)
 
+    def acitvate_sep_stream(self, job_id):
+        sep_url = base_url + 'jobs/' + job_id + '/activate'
+
+        try:
+            headers = {'Content-Type': 'application/json', 'X-API-KEY': self.api_token}
+
+            r = requests.put(sep_url, data="", headers=headers)
+            status = r.status_code
+            if r.status_code == 200:
+                alive_logger.info (r.text)
+            else:
+                alive_logger.error (r.status_code)
+                alive_logger.error (r.text)
+        except Exception as e:
+            alive_logger.error (e.message)
+
+    def deacitvate_sep_stream(self, job_id):
+        sep_url = base_url + 'jobs/' + job_id + '/deactivate'
+
+        try:
+            headers = {'Content-Type': 'application/json', 'X-API-KEY': self.api_token}
+
+            r = requests.put(sep_url, data="", headers=headers)
+            status = r.status_code
+            if r.status_code == 200:
+                alive_logger.info (r.text)
+            else:
+                alive_logger.error (r.status_code)
+                alive_logger.error (r.text)
+        except Exception as e:
+            alive_logger.error (e.message)
+
     def get_assets(self):
         url = base_url + 'ssai/slates/' + self.account_id
         

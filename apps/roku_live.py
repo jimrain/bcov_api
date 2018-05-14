@@ -53,6 +53,7 @@ class RokuLive():
         data = {
             "ad_insertion": True,
             "live_stream": True,
+            "static": True,
             "slate": slate_id,
             "region": "us-west-2",
             "reconnect_time": 20,
@@ -152,27 +153,36 @@ class RokuLive():
         job_details = pickle.load(open(roku_alive_job_file, "rb"))
         ad_config = pickle.load(open(ad_config_archive_file, "rb"))
 
-        print(json.dumps(job_details['ssai_playback_urls'], indent=2))
-        print(json.dumps(ad_config, indent=2))
+        app_id = ad_config['application']['application_id']
+        ssai_url = job_details['ssai_playback_urls'][app_id]['playback_url']
+
+        print("SSAI Playback URL: " + ssai_url)
 
 roku = RokuLive()
 
+# Step 1 - create the ad config
 # roku.create_and_store_ad_config()
-# roku.cleanup_ad_configs()
-# print (roku.bcov_live.get_account_ad_configurations())
 
+# Step 2 - create the live job
 # roku.create_and_store_job()
-# print (roku.bcov_live.ingest_slate(slate_url))
 
-roku.press_the_button(60)
-
-# roku.dump_the_pickle()
+# Step 3 - Configure the encoder
 # roku.dump_rtmp_info()
-# roku.dump_ad_config_archive()
-# roku.dump_ad_config()
+
+# Step 4 - Verify Playback
 # roku.dump_playback_url()
 
+# Step 5 - Verify ad playback
+# roku.press_the_button(60)
+
+# Step 6 - Kill the live job.
 # roku.kill_live_job()
+
+# Misc - utilities
+# print (roku.bcov_live.ingest_slate(slate_url))
+
+# roku.cleanup_ad_configs()
+# print (roku.bcov_live.get_account_ad_configurations())
 
 # print (json.dumps(roku.bcov_live.get_account_ad_configurations(), indent=2))
 
