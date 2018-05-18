@@ -102,6 +102,15 @@ class RokuLive():
         print(json.dumps(job_details, indent=2))
         pickle.dump(job_details, open(roku_alive_job_file, "wb"))
 
+    def activate_live_job(self):
+        job = pickle.load(open(roku_alive_job_file, "rb"))
+        job_id = job['id']
+        self.bcov_live.acitvate_sep_stream(job_id)
+
+    def deactivate_live_job(self):
+        job = pickle.load(open(roku_alive_job_file, "rb"))
+        job_id = job['id']
+        self.bcov_live.deacitvate_sep_stream(job_id)
 
     def create_and_store_ad_config(self):
         ad_config = self.create_ad_configuration()
@@ -166,16 +175,22 @@ roku = RokuLive()
 # Step 2 - create the live job
 # roku.create_and_store_job()
 
-# Step 3 - Configure the encoder
+# Step 3 - activate the live job
+# roku.activate_live_job()
+
+# Step 4 - Configure the encoder
 # roku.dump_rtmp_info()
 
-# Step 4 - Verify Playback
+# Step 5 - Verify Playback
 # roku.dump_playback_url()
 
-# Step 5 - Verify ad playback
+# Step 6 - Verify ad playback
 # roku.press_the_button(60)
 
-# Step 6 - Kill the live job.
+# Step 7 - deactivate the live job
+# roku.deactivate_live_job()
+
+# Step 8 - Kill the live job (optional)
 # roku.kill_live_job()
 
 # Misc - utilities
