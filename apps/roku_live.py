@@ -20,6 +20,10 @@ roku_alive_job_file = "RokuAliveJob.pkl"
 roku_ad_config_file = "RokuAdConfig.pkl"
 ad_config_archive_file = "Alive_ad_configs.pkl"
 
+# abc_news_ad_tag = "https://ravm.tv/ads?version=1.0&inv_type=rr&sz=1920x1080&ssai_req=1&ip=OTT_IP&coppa=OTT_ADS_KIDS_CONTENT&min_ad_duration=0&max_ad_duration=60000&is_raf=1&is_roku=1&rdid=ROKU_ADS_TRACKING_ID&ottid=OTT_ADS_TRACKING_ID&is_lat=OTT_ADS_LIMIT_TRACKING&is_roku_lat=ROKU_ADS_LIMIT_TRACKING&idtype=OTT_ID_TYPE&correlator=OTT_ADS_TIMESTAMP&scor=OTT_ADS_TIMESTAMP&pod=POD_NUM&ppos=POD_POSITION&ad_vertical=OTT_AD_VERTICAL&ad_roll=AD_ROLL&genre=OTT_CONTENT_GENRE&content=OTT_CONTENT_ID&length=OTT_CONTENT_LENGTH&device=OTT_DEVICE_MODEL&ua=OTT_USER_AGENT&ai=ROKU_ADS_APP_ID&ott_app_id=OTT_ADS_APP_ID&fb_url=&rtid=iZxSwaTKoSX9_EL3JX4zN_gEghuxbi4zq_NwOnIMJA4=&roku_cust_param"
+abc_news_ad_tag = "https://ravm.tv/ads?version=1.0&inv_type=rr&sz=1920x1080&ssai_req=1&ip={{client.ipaddress}}&coppa=OTT_ADS_KIDS_CONTENT&min_ad_duration=0&max_ad_duration=60000&is_raf=1&is_roku=1&rdid=ROKU_ADS_TRACKING_ID&ottid=OTT_ADS_TRACKING_ID&is_lat=OTT_ADS_LIMIT_TRACKING&is_roku_lat=ROKU_ADS_LIMIT_TRACKING&idtype=OTT_ID_TYPE&correlator={{random.int32}}&scor={{random.int32}}&pod=POD_NUM&ppos=POD_POSITION&ad_vertical=OTT_AD_VERTICAL&ad_roll=AD_ROLL&genre=OTT_CONTENT_GENRE&content=OTT_CONTENT_ID&length=OTT_CONTENT_LENGTH&device=OTT_DEVICE_MODEL&ua=OTT_USER_AGENT&ai=ROKU_ADS_APP_ID&ott_app_id=OTT_ADS_APP_ID&fb_url=&rtid=iZxSwaTKoSX9_EL3JX4zN_gEghuxbi4zq_NwOnIMJA4=&roku_cust_param"
+test_tag = "https://ads.brightcove.com/ads?tech=vast&dur=30&rtid={{rt_id}}"
+
 class RokuLive():
 
     def __init__(self):
@@ -29,7 +33,7 @@ class RokuLive():
     def create_ad_configuration(self):
         data = {
             "application_ad_configuration": {
-                "ad_configuration_description": "Roku Live Ad Config",
+                "ad_configuration_description": "Roku ABC Live Ad Config",
                 "ad_configuration_expected_response_type": "Vast",
                 "ad_configuration_strategy": "SingleAdResponse",
                 "ad_configuration_transforms": [
@@ -37,9 +41,9 @@ class RokuLive():
                         "xpath": "/",
                         "xslt": "<xsl:stylesheet version=\"1.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" xmlns:Det=\"http://Det.com\"><xsl:output omit-xml-declaration=\"yes\"/><xsl:template match=\"node()|@*\"><xsl:copy><xsl:apply-templates select=\"node()|@*\"/></xsl:copy></xsl:template></xsl:stylesheet>"
                     }],
-                "ad_configuration_url_format": "https://ads.brightcove.com/ads?tech=vast&dur=30",
+                "ad_configuration_url_format": abc_news_ad_tag,
             },
-            "application_description": "Roku Live ad application",
+            "application_description": "Roku ABC Live ad application",
             "account_id": account_id,
             "application_segment_buffer": 4
         }
@@ -185,7 +189,7 @@ roku = RokuLive()
 # roku.dump_playback_url()
 
 # Step 6 - Verify ad playback
-# roku.press_the_button(60)
+roku.press_the_button(60)
 
 # Step 7 - deactivate the live job
 # roku.deactivate_live_job()
