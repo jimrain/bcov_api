@@ -53,6 +53,7 @@ class BcovLive():
             status = r.status_code
             if r.status_code == 200:
                 alive_logger.info (r.text)
+                return r.json()
             else:
                 alive_logger.error (r.status_code)
                 alive_logger.error (r.text)
