@@ -95,9 +95,15 @@ class PeopleTVLive():
         job_id = job['id']
         self.bcov_live.acitvate_sep_stream(job_id)
 
+    def activate_live_job2(self, job_id):
+        self.bcov_live.acitvate_sep_stream(job_id)
+
     def deactivate_live_job(self):
         job = pickle.load(open(roku_alive_job_file, "rb"))
         job_id = job['id']
+        self.bcov_live.deacitvate_sep_stream(job_id)
+
+    def deactivate_live_job2(self, job_id):
         self.bcov_live.deacitvate_sep_stream(job_id)
 
     def create_and_store_ad_config(self):
@@ -161,9 +167,12 @@ class PeopleTVLive():
 
 ptv = PeopleTVLive()
 
-job_id = "90dcf390063d411ba84c0bd18fc06330"
+# job_id = "90dcf390063d411ba84c0bd18fc06330"
          # /us-east-1/5755101710001/b1fd4a8527534d158bba12282529a7e4/playlist_ssaiM.m3u8
-# ptv.get_job(job_id)
+job_id = '94e17775a2864be0a8997e0a7f2a7db0'
+# ptv.deactivate_live_job2(job_id)
+# ptv.activate_live_job2(job_id)
+ptv.get_job(job_id)
 
 # Step 1 - create the ad config
 # roku.create_and_store_ad_config()
@@ -172,7 +181,7 @@ job_id = "90dcf390063d411ba84c0bd18fc06330"
 # ptv.create_and_store_job()
 
 # Step 3 - activate the live job
-ptv.activate_live_job()
+# ptv.activate_live_job()
 
 # Step 4 - Configure the encoder
 # roku.dump_rtmp_info()

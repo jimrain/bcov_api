@@ -111,9 +111,15 @@ class RokuLive():
         job_id = job['id']
         self.bcov_live.acitvate_sep_stream(job_id)
 
+    def activate_live_job2(self, job_id):
+        self.bcov_live.acitvate_sep_stream(job_id)
+
     def deactivate_live_job(self):
         job = pickle.load(open(roku_alive_job_file, "rb"))
         job_id = job['id']
+        self.bcov_live.deacitvate_sep_stream(job_id)
+
+    def deactivate_live_job2(self, job_id):
         self.bcov_live.deacitvate_sep_stream(job_id)
 
     def create_and_store_ad_config(self):
@@ -156,6 +162,7 @@ class RokuLive():
         print ("Application Name: " + job_details['id'])
         stream_info = urlparse(job_details['stream_url'])
         print ("Host: " + stream_info.netloc.split(':')[0])
+        print("RTMP Endpoint: " + job_details['stream_url'])
         print("Stream Name: " + job_details['stream_name'])
 
     def dump_ad_config(self):
@@ -170,6 +177,11 @@ class RokuLive():
         ssai_url = job_details['ssai_playback_urls'][app_id]['playback_url']
 
         print("SSAI Playback URL: " + ssai_url)
+
+    def get_live_job(self, job_id):
+
+        data = self.bcov_live.get_job(job_id)
+        print(json.dumps(data, indent=2))
 
 roku = RokuLive()
 
@@ -189,7 +201,7 @@ roku = RokuLive()
 # roku.dump_playback_url()
 
 # Step 6 - Verify ad playback
-roku.press_the_button(60)
+# roku.press_the_button(60)
 
 # Step 7 - deactivate the live job
 # roku.deactivate_live_job()
@@ -205,3 +217,11 @@ roku.press_the_button(60)
 
 # print (json.dumps(roku.bcov_live.get_account_ad_configurations(), indent=2))
 # roku.dump_the_pickle()
+
+# job_id = '6df8989f8e894a95a1b2d7ce94408630'
+job_id = '382de8cf91754c70815b06af58b7ed9e'
+
+# '382de8cf91754c70815b06af58b7ed9e'.sep.bcovlive.io:1935/382de8cf91754c70815b06af58b7ed9e
+# roku.deactivate_live_job2(job_id)
+# roku.activate_live_job2(job_id)
+roku.get_live_job(job_id)
