@@ -3,6 +3,8 @@ from urllib.parse import urlparse
 import pickle
 import json
 import os
+import time
+import requests
 
 # Live auth tokens.
 api_token = 'rvCkWHIDhs4FwUyk2oS0Q7iB9GsXNz5A20UJu1al'
@@ -21,7 +23,8 @@ roku_ad_config_file = "RokuAdConfig.pkl"
 ad_config_archive_file = "Alive_ad_configs.pkl"
 
 # abc_news_ad_tag = "https://ravm.tv/ads?version=1.0&inv_type=rr&sz=1920x1080&ssai_req=1&ip=OTT_IP&coppa=OTT_ADS_KIDS_CONTENT&min_ad_duration=0&max_ad_duration=60000&is_raf=1&is_roku=1&rdid=ROKU_ADS_TRACKING_ID&ottid=OTT_ADS_TRACKING_ID&is_lat=OTT_ADS_LIMIT_TRACKING&is_roku_lat=ROKU_ADS_LIMIT_TRACKING&idtype=OTT_ID_TYPE&correlator=OTT_ADS_TIMESTAMP&scor=OTT_ADS_TIMESTAMP&pod=POD_NUM&ppos=POD_POSITION&ad_vertical=OTT_AD_VERTICAL&ad_roll=AD_ROLL&genre=OTT_CONTENT_GENRE&content=OTT_CONTENT_ID&length=OTT_CONTENT_LENGTH&device=OTT_DEVICE_MODEL&ua=OTT_USER_AGENT&ai=ROKU_ADS_APP_ID&ott_app_id=OTT_ADS_APP_ID&fb_url=&rtid=iZxSwaTKoSX9_EL3JX4zN_gEghuxbi4zq_NwOnIMJA4=&roku_cust_param"
-abc_news_ad_tag = "https://ravm.tv/ads?version=1.0&inv_type=rr&sz=1920x1080&ssai_req=1&ip={{client.ipaddress}}&coppa=OTT_ADS_KIDS_CONTENT&min_ad_duration=0&max_ad_duration=60000&is_raf=1&is_roku=1&rdid=ROKU_ADS_TRACKING_ID&ottid=OTT_ADS_TRACKING_ID&is_lat=OTT_ADS_LIMIT_TRACKING&is_roku_lat=ROKU_ADS_LIMIT_TRACKING&idtype=OTT_ID_TYPE&correlator={{random.int32}}&scor={{random.int32}}&pod=POD_NUM&ppos=POD_POSITION&ad_vertical=OTT_AD_VERTICAL&ad_roll=AD_ROLL&genre=OTT_CONTENT_GENRE&content=OTT_CONTENT_ID&length=OTT_CONTENT_LENGTH&device=OTT_DEVICE_MODEL&ua=OTT_USER_AGENT&ai=ROKU_ADS_APP_ID&ott_app_id=OTT_ADS_APP_ID&fb_url=&rtid=iZxSwaTKoSX9_EL3JX4zN_gEghuxbi4zq_NwOnIMJA4=&roku_cust_param"
+# people_tv_ad_tag = “https://ravm.tv/ads?version=1.0&inv_type=rr&sz=1920x1080&ssai_req=1&ip={{client.ipaddress}}&coppa=OTT_ADS_KIDS_CONTENT&min_ad_duration=0&max_ad_duration=60000&is_raf=1&is_roku=1&rdid=ROKU_ADS_TRACKING_ID&ottid=OTT_ADS_TRACKING_ID&is_lat=OTT_ADS_LIMIT_TRACKING&is_roku_lat=ROKU_ADS_LIMIT_TRACKING&idtype=OTT_ID_TYPE&correlator=OTT_ADS_TIMESTAMP&scor=OTT_ADS_TIMESTAMP&pod=POD_NUM&ppos=POD_POSITION&ad_vertical=OTT_AD_VERTICAL&ad_roll=AD_ROLL&genre={{live.adbreakdurationint}}000&content=OTT_CONTENT_ID&length=OTT_CONTENT_LENGTH&device=OTT_DEVICE_MODEL&ua=OTT_USER_AGENT&ai=ROKU_ADS_APP_ID&ott_app_id=OTT_ADS_APP_ID&fb_url=&rtid=ES6dHdJEtK6LO9VW9yON_xgjdPBECu2mgM6aKSJ-Nzc=&roku_cust_param”
+abc_news_ad_tag = "https://ravm.tv/ads?version=1.0&inv_type=rr&sz=1920x1080&ssai_req=1&ip={{client.ipaddress}}&coppa=OTT_ADS_KIDS_CONTENT&min_ad_duration=0&max_ad_duration=60000&is_raf=1&is_roku=1&rdid=ROKU_ADS_TRACKING_ID&ottid=OTT_ADS_TRACKING_ID&is_lat=OTT_ADS_LIMIT_TRACKING&is_roku_lat=ROKU_ADS_LIMIT_TRACKING&idtype=OTT_ID_TYPE&correlator={{random.int32}}&scor={{random.int32}}&pod=POD_NUM&ppos=POD_POSITION&ad_vertical=OTT_AD_VERTICAL&ad_roll=AD_ROLL&genre={{live.adbreakdurationint}}000&content=OTT_CONTENT_ID&length=OTT_CONTENT_LENGTH&device=OTT_DEVICE_MODEL&ua=OTT_USER_AGENT&ai=ROKU_ADS_APP_ID&ott_app_id=OTT_ADS_APP_ID&fb_url=&rtid=iZxSwaTKoSX9_EL3JX4zN_gEghuxbi4zq_NwOnIMJA4=&roku_cust_param"
 test_tag = "https://ads.brightcove.com/ads?tech=vast&dur=30&rtid={{rt_id}}"
 
 class RokuLive():
@@ -33,9 +36,9 @@ class RokuLive():
     def create_ad_configuration(self):
         data = {
             "application_ad_configuration": {
-                "ad_configuration_description": "Roku ABC Live Ad Config",
+                "ad_configuration_description": "Roku ABC Live Ad Config with duration",
                 "ad_configuration_expected_response_type": "Vast",
-                "ad_configuration_strategy": "SingleAdResponse",
+                "ad_configuration_strategy": "MultipleAdResponse",
                 "ad_configuration_transforms": [
                     {
                         "xpath": "/",
@@ -43,7 +46,7 @@ class RokuLive():
                     }],
                 "ad_configuration_url_format": abc_news_ad_tag,
             },
-            "application_description": "Roku ABC Live ad application",
+            "application_description": "Roku ABC Live ad application with duration",
             "account_id": account_id,
             "application_segment_buffer": 4
         }
@@ -142,9 +145,9 @@ class RokuLive():
         os.remove(roku_alive_job_file)
 
 
-    def press_the_button(self, duration):
-        job_dict = pickle.load(open(roku_alive_job_file, "rb"))
-        job_id = job_dict['id']
+    def press_the_button(self, job_id, duration):
+        # job_dict = pickle.load(open(roku_alive_job_file, "rb"))
+        # job_id = job_dict['id']
 
         self.bcov_live.big_red_button(job_id, duration)
 
@@ -183,8 +186,34 @@ class RokuLive():
         data = self.bcov_live.get_job(job_id)
         print(json.dumps(data, indent=2))
 
+    def hit_big_red_button_every_10(self, job_id):
+        while (True):
+            print("Pressing the button...")
+            self.press_the_button(job_id, 120)
+            time.sleep(600)
+
+    def activate_job_every_10(self, job_id):
+        while (True):
+            print("Activating Job...")
+            self.activate_live_job2(job_id)
+            time.sleep(600)
+
+    def test_ad_tag(self):
+        test_ad_tag = "https://ravm.tv/ads?version=1.0&inv_type=rr&sz=1920x1080&ssai_req=1&ip=64.139.253.222&coppa=OTT_ADS_KIDS_CONTENT&min_ad_duration=0&max_ad_duration=60000&is_raf=1&is_roku=1&rdid=ROKU_ADS_TRACKING_ID&ottid=OTT_ADS_TRACKING_ID&is_lat=OTT_ADS_LIMIT_TRACKING&is_roku_lat=ROKU_ADS_LIMIT_TRACKING&idtype=OTT_ID_TYPE&correlator=654321&scor=654321&pod=POD_NUM&ppos=POD_POSITION&ad_vertical=OTT_AD_VERTICAL&ad_roll=AD_ROLL&genre=120000&content=OTT_CONTENT_ID&length=OTT_CONTENT_LENGTH&device=OTT_DEVICE_MODEL&ua=OTT_USER_AGENT&ai=ROKU_ADS_APP_ID&ott_app_id=OTT_ADS_APP_ID&fb_url=&rtid=iZxSwaTKoSX9_EL3JX4zN_gEghuxbi4zq_NwOnIMJA4=&roku_cust_param"
+
+        # alive_logger.info(headers)
+        r = requests.get(test_ad_tag)
+
+        print (r.text)
+        # data = r.json()
+
+        # print(json.dumps(data, indent=2))
+
+
 roku = RokuLive()
 
+job_id = '382de8cf91754c70815b06af58b7ed9e'
+application_id =  "125db503b1794886899e5ffa73333d48"
 # Step 1 - create the ad config
 # roku.create_and_store_ad_config()
 
@@ -201,7 +230,7 @@ roku = RokuLive()
 # roku.dump_playback_url()
 
 # Step 6 - Verify ad playback
-# roku.press_the_button(60)
+# roku.press_the_button(job_id, 60)
 
 # Step 7 - deactivate the live job
 # roku.deactivate_live_job()
@@ -219,9 +248,16 @@ roku = RokuLive()
 # roku.dump_the_pickle()
 
 # job_id = '6df8989f8e894a95a1b2d7ce94408630'
-job_id = '382de8cf91754c70815b06af58b7ed9e'
 
+# roku.create_ad_configuration()
 # '382de8cf91754c70815b06af58b7ed9e'.sep.bcovlive.io:1935/382de8cf91754c70815b06af58b7ed9e
 # roku.deactivate_live_job2(job_id)
 # roku.activate_live_job2(job_id)
-roku.get_live_job(job_id)
+# App ID: 6530ce8c27924774bbf8fddd6e9693fa
+# roku.get_live_job(job_id)
+# roku.dump_ad_config()
+roku.hit_big_red_button_every_10(job_id)
+
+# roku.activate_job_every_10(job_id)
+
+# roku.test_ad_tag()

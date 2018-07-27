@@ -52,7 +52,7 @@ class BcovLive():
             r = requests.get(url, data="", headers=headers)
             status = r.status_code
             if r.status_code == 200:
-                alive_logger.info (r.text)
+                # alive_logger.info (r.text)
                 return r.json()
             else:
                 alive_logger.error (r.status_code)
@@ -143,11 +143,15 @@ class BcovLive():
             alive_logger.error (e.message)
 
     def create_ad_configuration(self, data):
-        url = base_url + 'ssai/application'
+        url = base_url + 'ssai/applications'
+        print (url)
 
         try:
             headers = {'Content-Type': 'application/json', 'X-API-KEY': self.api_token}
 
+            # print ("Headers: " + str(headers))
+
+            # print ("Data: " + json.dumps(data))
             r = requests.post(url, data=json.dumps(data), headers=headers)
             status = r.status_code
             if r.status_code == 200:
