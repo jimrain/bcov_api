@@ -109,8 +109,9 @@ class BcovLive():
             alive_logger.error (e.message)
 
     def get_assets(self):
-        url = base_url + 'ssai/slates/' + self.account_id
-        
+        # url = base_url + 'ssai/slates/' + self.account_id
+        url = base_url + 'ssai/slates'
+
         try:
             headers = {'Content-Type': 'application/json', 'X-API-KEY': self.api_token}
 
@@ -125,11 +126,10 @@ class BcovLive():
             alive_logger.error(e.message)
 
     def ingest_slate(self, slate_url):
-        url = base_url + 'ssai/slate'
+        url = base_url + 'ssai/slates'
         data = {"source_url": slate_url, "account_id": self.account_id}
         try:
             headers = {'Content-Type': 'application/json', 'X-API-KEY': self.api_token}
-
             r = requests.post(url, data=json.dumps(data), headers=headers)
             status = r.status_code
             if r.status_code == 200:

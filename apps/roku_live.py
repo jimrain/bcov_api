@@ -16,6 +16,9 @@ account_id = 'b1eee28922d14ed0b737229dd8cfa457'
 slate_url = 'http://solutions.brightcove.com/jrainville/Videos/RokuSlate.mp4'
 slate_id = "c9cc8260f202449cb776999915e6a7b2"
 
+abc_slate_url = 'http://solutions.brightcove.com/jrainville/Videos/abc_slate.mp4'
+abc_slate_id = '7c43c17a9b474a80bbb8f640b846e2c2'
+
 clipping_creds = 'jrainville-cred'
 
 roku_alive_job_file = "RokuAliveJob.pkl"
@@ -48,7 +51,7 @@ class RokuLive():
             },
             "application_description": "Roku ABC Live ad application with duration",
             "account_id": account_id,
-            "application_segment_buffer": 4
+            "application_segment_buffer": 4,
         }
 
         ad_config = self.bcov_live.create_ad_configuration(data)
@@ -61,10 +64,19 @@ class RokuLive():
             "ad_insertion": True,
             "live_stream": True,
             "static": True,
-            "slate": slate_id,
+            "slate": abc_slate_id,
             "region": "us-west-2",
             "reconnect_time": 20,
             "live_sliding_window_duration": 30,
+            "ad_audio_loudness_level": -23,
+            "add_cdns": [
+                {
+                    "label": "abcnewslive",
+                    "prepend": "abcnewslive.akamaized.net",
+                    "protocol": "http",
+                    "vendor": "akamai"
+                },
+            ],
             "notifications": [
                 "http://rainville.net:5000/notification",
                 {
@@ -212,8 +224,19 @@ class RokuLive():
 
 roku = RokuLive()
 
-job_id = '382de8cf91754c70815b06af58b7ed9e'
+# job_id = '382de8cf91754c70815b06af58b7ed9e'
+
+job_id = '0765a4a53a0b4a60861e35f0e0b96d24'
 application_id =  "125db503b1794886899e5ffa73333d48"
+
+job_id_abc_slate = 'b7a945a127c94926ae33bc7e83315067'
+job_id_abc_slate_adjusted_volume = '82d95596697a4bf7933e8eef3da7aaa5'
+job_id_abc_cdn = '969431c625e0418ea10b6122b9682af8'
+
+
+# roku.bcov_live.ingest_slate(abc_slate_url)
+# roku.bcov_live.get_assets()
+
 # Step 1 - create the ad config
 # roku.create_and_store_ad_config()
 
@@ -252,12 +275,17 @@ application_id =  "125db503b1794886899e5ffa73333d48"
 # roku.create_ad_configuration()
 # '382de8cf91754c70815b06af58b7ed9e'.sep.bcovlive.io:1935/382de8cf91754c70815b06af58b7ed9e
 # roku.deactivate_live_job2(job_id)
-# roku.activate_live_job2(job_id)
+# roku.activate_live_job2(job_id_abc_slate_adjusted_volume)
 # App ID: 6530ce8c27924774bbf8fddd6e9693fa
+
 # roku.get_live_job(job_id)
 # roku.dump_ad_config()
-roku.hit_big_red_button_every_10(job_id)
+# roku.hit_big_red_button_every_10(job_id)
 
 # roku.activate_job_every_10(job_id)
 
+# roku.press_the_button(job_id, 120)
+
 # roku.test_ad_tag()
+test_app_id = '1aa2938f028840679887b56c9a22b2cd'
+roku.bcov_live.get_ad_configuration(test_app_id)
