@@ -278,7 +278,7 @@ job_id_abc_cdn = '969431c625e0418ea10b6122b9682af8'
 # roku.activate_live_job2(job_id_abc_slate_adjusted_volume)
 # App ID: 6530ce8c27924774bbf8fddd6e9693fa
 
-# roku.get_live_job(job_id)
+roku.get_live_job(job_id)
 # roku.dump_ad_config()
 # roku.hit_big_red_button_every_10(job_id)
 
@@ -287,5 +287,5 @@ job_id_abc_cdn = '969431c625e0418ea10b6122b9682af8'
 # roku.press_the_button(job_id, 120)
 
 # roku.test_ad_tag()
-test_app_id = '1aa2938f028840679887b56c9a22b2cd'
-roku.bcov_live.get_ad_configuration(test_app_id)
+# test_app_id = '1aa2938f028840679887b56c9a22b2cd'
+# roku.bcov_live.get_ad_configuration(test_app_id)

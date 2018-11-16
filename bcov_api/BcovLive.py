@@ -295,6 +295,24 @@ class BcovLive():
             alive_logger.error (e.message)
             
 
+    def insert_id3_tag(self, job_id, id3_tag):
+        url = base_url + 'jobs/' + job_id + '/id3tag'
+
+        try:
+            headers = {'Content-Type': 'application/json', 'X-API-KEY': self.api_token}
+            data = id3_tag
+            r = requests.post(url, data=json.dumps(data), headers=headers)
+            status = r.status_code
+            if r.status_code == 200:
+                j = r.json()
+                alive_logger.info(json.dumps(j, indent=2))
+                return (j)
+            else:
+                alive_logger.error(r.status_code)
+                alive_logger.error(r.text)
+        except Exception as e:
+            alive_logger.error(e.message)
+
 if __name__ == '__main__':
     alive_logger.error ("Nothing to see here - must be called from a sub class")
 
