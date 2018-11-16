@@ -138,8 +138,8 @@ class JimFun():
         print(job_id)
         id3_tag = {
             "id3_tag": {
-                "name": "BCOV",
-                "value": "overlay_off",
+                "name": "oON",
+                "value": "overlay_on",
             }
         }
         self.bcov_live.insert_id3_tag(job_id, id3_tag)
